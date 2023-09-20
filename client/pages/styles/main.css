@@ -4,6 +4,7 @@
 @tailwind components;
 @tailwind utilities;
 /* styles/main.css */
+
 *{
   margin: 0;
   padding: 0;
@@ -20,7 +21,19 @@ body {
     
    
   }
+
+  .truncate-text {
+    overflow: hidden;        /* Hide any content that overflows the container */
+    text-overflow: ellipsis; /* Display an ellipsis (...) for truncated text */
+    max-height: 80px;        /* Adjust the max height as needed */
+    display: -webkit-box;    /* Required for WebKit (Safari, Chrome) */
+    -webkit-line-clamp: 4;  /* Number of lines to show before truncating */
+    -webkit-box-orient: vertical; /* Vertical layout for lines */
+    word-wrap: break-word;   /* Allow word wrapping */
+    overflow-wrap: break-word; /* Allow word wrapping for browsers that support it */
+  }
   
+
 .container{
  
   height: 100vh;
@@ -37,6 +50,7 @@ body {
     height: 100vh;
 
   }
+  
   .center{
     display: flex;
     align-items: center;

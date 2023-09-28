@@ -10,7 +10,7 @@
   padding: 0;
 }
 body {
-    font-family: Arial, sans-serif;
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
     background-color: rgb(5, 4, 15);
     min-height: 100vh;
   
@@ -20,6 +20,15 @@ body {
 
     
    
+  }
+  .aboutme{
+    background-color: rgb(26, 120, 214);
+    height: 35px;
+    color: white;
+    width: 100px;
+    
+    border-radius: 10px;
+  
   }
 
   .truncate-text {

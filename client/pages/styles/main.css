@@ -60,6 +60,10 @@ body {
 
   }
   
+  .profile{
+    box-shadow: rgba(124, 120, 120, 0.56) 0px 22px 70px 4px;
+  }
+  
   .center{
     display: flex;
     align-items: center;

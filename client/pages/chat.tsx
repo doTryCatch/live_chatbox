@@ -2,16 +2,19 @@
 import { io } from "socket.io-client";
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/router";
-import Script from "next/script";
 import Image from "next/image";
 import Send from "./images/send.png";
-import File from "./images/file.png";
+
 
 const socket = io("http://localhost:3001");
 const color = ["yellow", "blue", "yellow", "orange", "green"];
 var sent = false;
 
 export default function Page() {
+  const route=useRouter()
+  const handle_About=()=>{
+    route.push({pathname:"/aboutme"})
+  }
   const get_current_time=()=>{
     const time=new Date();
     let hour=time.getHours()
@@ -64,7 +67,7 @@ export default function Page() {
 
     socket.on("receive", (msg) => {
       console.log("receive", msg);
-      setAction({ message: msg.message, side: "justify-start", color: "bg-orange-700" ,name:msg.name});
+      setAction({ message: msg.message, side: "justify-start", color: "bg-orange-800" ,name:msg.name});
     });
 
     return () => {
@@ -79,7 +82,7 @@ export default function Page() {
 
   const send = () => {
     socket.emit("send", Msg);
-    setAction({ message: Msg, side: "justify-end", color: "bg-green-700",name:"you" });
+    setAction({ message: Msg, side: "justify-end", color: "bg-green-800",name:"you" });
     console.log("send", Msg);
   };
 
@@ -122,13 +125,13 @@ export default function Page() {
     childDiv.classList.add(action.color);
      // Create the child div element for sender or receiver name counter
      const childDiv2 = document.createElement("div");
-     childDiv2.className = `float-right min-w-[90px] flex space-x-4 text-gray-900 `;
-     childDiv2.classList.add(action.side);
+     childDiv2.className = ` justify-end min-w-[90px] flex space-x-4 text-black`;
+    //  childDiv2.classList.add(action.side);
      const para = document.createElement("p");
-     para.className = "text-[10px] text-bold";
+     para.className = "text-[11px] text-bold";
      para.textContent = action.name
      const time = document.createElement("p");
-     time.className = "text-[10px] text-bold";
+     time.className = "text-[11px] text-bold";
      time.textContent = get_current_time()
      childDiv2.append(para) 
      childDiv2.append(time)
@@ -161,7 +164,7 @@ export default function Page() {
           <div className="show_content_area w-[100%] h-[35vh] text-center ">
             <div className="about w-[60%] flex items-center justify-between">
               <div className="aboutme ml-5 -mt-10 md:-mt-2 md:-ml-40 center">
-                <button className="text-white">About Me</button>
+                <button className="text-white" onClick={handle_About}>About Me</button>
               </div>
               <div className="head center">
                 <h1 className="text-[25px] text-bold text-white">News</h1>

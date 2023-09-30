@@ -75,16 +75,38 @@ export default function Page() {
       socket.disconnect();
     };
   }, [room]);
+ 
+
+  const scrollToBottom = () => {
+    if (chatContainerRef.current) {
+    
+      const { scrollHeight, clientHeight } =chatContainerRef.current;
+      chatContainerRef.current.scrollTop +=scrollHeight-clientHeight;  
+  
+      
+
+    }
+  };
 
   const set_value = (e) => {
     setMsg(e.target.value);
   };
 
   const send = () => {
+    if (Msg!="") {
     socket.emit("send", Msg);
     setAction({ message: Msg, side: "justify-end", color: "bg-green-800",name:"you" });
-    console.log("send", Msg);
+   setMsg('')
+ 
+    }
+    
   };
+const Enter_press=(e)=>{
+  if( e.code=="Enter") send()
+
+}
+   
+
 
   // Fetch news data from the API
   const fetchNewsData = () => {
@@ -144,7 +166,6 @@ export default function Page() {
     action.message != ""
       ? (paragraph.textContent = action.message)
       : (paragraph.textContent = "Welcome to this chat house!!!");
-
     // Append the paragraph to the child div
     childDiv.appendChild(paragraph);
     childDiv.append(childDiv2)
@@ -153,6 +174,7 @@ export default function Page() {
     parentDiv.appendChild(childDiv);
 
     board?.append(parentDiv);
+    scrollToBottom()
   }, [action]);
 
   // News appearance from API
@@ -199,7 +221,7 @@ export default function Page() {
               </div>
             </div>
           </div>
-          <div className="flex-grow overflow-y-auto px-4 h-[45vh] w-full board" ref={chatContainerRef}></div>
+          <div className=" overflow-y-auto px-4 max-h-[300px] w-full board" ref={chatContainerRef}></div>
 
           <div className="type_area w-[100%] flex items-center justify-center my-8  ">
             <div className="cont flex w-[90%] md:w-[95%]">
@@ -207,7 +229,9 @@ export default function Page() {
                 <input
                   type="text"
                   id="room-id"
+                  value={Msg}
                   onChange={set_value}
+                  onKeyDown={Enter_press}
                   className="input-area text-slate-200 w-[100%] px-3 py-2 border-b bg-transparent border-gray-300 focus:outline-none focus:border-blue-500"
                   placeholder="Enter Message"
                 />

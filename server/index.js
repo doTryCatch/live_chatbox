@@ -5,6 +5,9 @@ const http = require('http');
 const { get } = require('https');
 const server = http.createServer(app);
 const { Server } = require("socket.io");
+app.get('/',(req,res)=>{
+  res.send("server is live and running")
+})
 
 const io = new Server(server, {
   cors: {

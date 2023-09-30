@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+const PORT =process.env.PORT || 3001
 const http = require('http');
 const { get } = require('https');
 const server = http.createServer(app);
@@ -32,13 +33,12 @@ io.on('connection', (socket) => {
   });
 
   socket.on("send", (msg) => {
-    // Use socket.rooms as an array and exclude the socket's own ID
+    // Use socket.rooms as an array to filter our own id and make a list/array of other joined people
     const roomsArray = Array.from(socket.rooms).filter(room => room !== socket.id);
 
     if (roomsArray.length > 0) {
       const room = roomsArray[0]; // Assuming a socket is in only one room
-      // console.log(`User ${socket.id} sent a message in room ${room}: ${msg}`);
-      socket.to(room).emit("receive", {message:msg,name:userName.get(socket.id)});
+      socket.to(room).emit("receive", {message:msg,name:userName.get(socket.id)});//broadcast the message and sender name to all participanst
     }
   });
 
@@ -58,6 +58,6 @@ io.on('connection', (socket) => {
   });
 });
 
-server.listen(3001, () => {
+server.listen(PORT, () => {
   console.log('listening on *:3001');
 });

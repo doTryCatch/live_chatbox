@@ -5,25 +5,27 @@ import { useRouter } from "next/router";
 import Image from "next/image";
 import Send from "./images/send.png";
 
-
-const socket = io("http://localhost:3001");
+const socket = io("https://chat-server-3lqo.onrender.com");
 const color = ["yellow", "blue", "yellow", "orange", "green"];
 var sent = false;
 
 export default function Page() {
-  const route=useRouter()
-  const handle_About=()=>{
-    route.push({pathname:"/aboutme"})
-  }
-  const get_current_time=()=>{
-    const time=new Date();
-    let hour=time.getHours()
-    let minutes=time.getMinutes()
-    let amPm=hour>=12?"PM":"AM"
-    hour=hour>12? hour-12: hour
-    let min=minutes<10? "0"+minutes:minutes
-    return `${hour}:${min} ${amPm}`
-  }
+  const route = useRouter();
+
+  const handle_About = () => {
+    route.push({ pathname: "/aboutme" });
+  };
+
+  const get_current_time = () => {
+    const time = new Date();
+    let hour = time.getHours();
+    let minutes = time.getMinutes();
+    let amPm = hour >= 12 ? "PM" : "AM";
+    hour = hour > 12 ? hour - 12 : hour;
+    let min = minutes < 10 ? "0" + minutes : minutes;
+    return `${hour}:${min} ${amPm}`;
+  };
+
   const router = useRouter();
   const brosweRef = useRef(null);
   const [index, setIndex] = useState(0);
@@ -34,8 +36,7 @@ export default function Page() {
       content: "",
       img: "",
       url: "",
-      date: ""
-      
+      date: "",
     },
   ]);
 
@@ -44,30 +45,36 @@ export default function Page() {
     message: "",
     side: "justify-start",
     color: "bg-white-700",
-    name:""
+    name: "",
   });
 
-  const chatContainerRef = useRef(null);
+  // ✅ FIXED TYPE for the chat container reference
+  const chatContainerRef = useRef<HTMLDivElement | null>(null);
+
   const { name, room } = router.query;
 
   useEffect(() => {
     fetchNewsData();
   }, []);
+
   setTimeout(() => {
     var i = index;
     i < news_data.length - 1 ? i++ : (i = 0);
     setIndex(i);
-
-    // console.log(news_data[index])
   }, 7000);
 
   useEffect(() => {
     // Socket.io logic for joining a room and receiving messages
-    socket.emit("join", {name,room});
+    socket.emit("join", { name, room });
 
     socket.on("receive", (msg) => {
       console.log("receive", msg);
-      setAction({ message: msg.message, side: "justify-start", color: "bg-orange-800" ,name:msg.name});
+      setAction({
+        message: msg.message,
+        side: "justify-start",
+        color: "bg-orange-800",
+        name: msg.name,
+      });
     });
 
     return () => {
@@ -75,38 +82,34 @@ export default function Page() {
       socket.disconnect();
     };
   }, [room]);
- 
 
   const scrollToBottom = () => {
     if (chatContainerRef.current) {
-    
-      const { scrollHeight, clientHeight } =chatContainerRef.current;
-      chatContainerRef.current.scrollTop +=scrollHeight-clientHeight;  
-  
-      
-
+      const { scrollHeight, clientHeight } = chatContainerRef.current;
+      chatContainerRef.current.scrollTop += scrollHeight - clientHeight;
     }
   };
 
-  const set_value = (e) => {
+  const set_value = (e: React.ChangeEvent<HTMLInputElement>) => {
     setMsg(e.target.value);
   };
 
   const send = () => {
-    if (Msg!="") {
-    socket.emit("send", Msg);
-    setAction({ message: Msg, side: "justify-end", color: "bg-green-800",name:"you" });
-   setMsg('')
- 
+    if (Msg !== "") {
+      socket.emit("send", Msg);
+      setAction({
+        message: Msg,
+        side: "justify-end",
+        color: "bg-green-800",
+        name: "you",
+      });
+      setMsg("");
     }
-    
   };
-const Enter_press=(e)=>{
-  if( e.code=="Enter") send()
 
-}
-   
-
+  const Enter_press = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.code === "Enter") send();
+  };
 
   // Fetch news data from the API
   const fetchNewsData = () => {
@@ -119,7 +122,7 @@ const Enter_press=(e)=>{
       })
       .then((data) => {
         const news = data.results;
-        const formattedNews = news.map((elem) => ({
+        const formattedNews = news.map((elem: any) => ({
           title: elem.title,
           content: elem.description,
           img: elem.image_url,
@@ -129,7 +132,7 @@ const Enter_press=(e)=>{
         setNews(formattedNews);
       })
       .catch((error) => {
-        console.error('Error fetching news data:', error);
+        console.error("Error fetching news data:", error);
       });
   };
 
@@ -143,41 +146,40 @@ const Enter_press=(e)=>{
 
     // Create the child div element
     const childDiv = document.createElement("div");
-    childDiv.className = `max-w-xs mx-2 my-2 p-3  rounded-lg shadow-md text-white space-y-2`;
+    childDiv.className = `max-w-xs mx-2 my-2 p-3 rounded-lg shadow-md text-white space-y-2`;
     childDiv.classList.add(action.color);
-     // Create the child div element for sender or receiver name counter
-     const childDiv2 = document.createElement("div");
-     childDiv2.className = ` justify-end min-w-[90px] flex space-x-4 text-black`;
-    //  childDiv2.classList.add(action.side);
-     const para = document.createElement("p");
-     para.className = "text-[11px] text-bold";
-     para.textContent = action.name
-     const time = document.createElement("p");
-     time.className = "text-[11px] text-bold";
-     time.textContent = get_current_time()
-     childDiv2.append(para) 
-     childDiv2.append(time)
- 
-   
 
-    // Create the paragraph element
+    // Create the child div element for sender or receiver name + time
+    const childDiv2 = document.createElement("div");
+    childDiv2.className = `justify-end min-w-[90px] flex space-x-4 text-black`;
+
+    const para = document.createElement("p");
+    para.className = "text-[11px] font-bold";
+    para.textContent = action.name;
+
+    const time = document.createElement("p");
+    time.className = "text-[11px] font-bold";
+    time.textContent = get_current_time();
+
+    childDiv2.append(para);
+    childDiv2.append(time);
+
+    // Create the paragraph element for message
     const paragraph = document.createElement("p");
-    paragraph.className = "text-sm text-bold";
-    action.message != ""
-      ? (paragraph.textContent = action.message)
-      : (paragraph.textContent = "Welcome to this chat house!!!");
-    // Append the paragraph to the child div
+    paragraph.className = "text-sm font-bold";
+    paragraph.textContent =
+      action.message !== ""
+        ? action.message
+        : "Welcome to this chat house!!!";
+
+    // Append to DOM
     childDiv.appendChild(paragraph);
-    childDiv.append(childDiv2)
-
-    // Append the child div to the parent div
+    childDiv.append(childDiv2);
     parentDiv.appendChild(childDiv);
-
     board?.append(parentDiv);
-    scrollToBottom()
-  }, [action]);
 
-  // News appearance from API
+    scrollToBottom();
+  }, [action]);
 
   return (
     <>
@@ -186,19 +188,21 @@ const Enter_press=(e)=>{
           <div className="show_content_area w-[100%] h-[35vh] text-center ">
             <div className="about w-[60%] flex items-center justify-between">
               <div className="aboutme ml-5 -mt-10 md:-mt-2 md:-ml-40 center">
-                <button className="text-white" onClick={handle_About}>About Me</button>
+                <button className="text-white" onClick={handle_About}>
+                  About Me
+                </button>
               </div>
               <div className="head center">
-                <h1 className="text-[25px] text-bold text-white">News</h1>
+                <h1 className="text-[25px] font-bold text-white">News</h1>
               </div>
             </div>
             <div className="news w-[95%] h-[80%] center ">
               <div className="text-white w-[100%] md:h-[100%] center h-[100%] flex">
-                <div className="img w-[45%] md:w-[35%] md:h-[90%] h-[70%]  flex items-center justify-center ml-5 shadow-md opacity-70 rounded-lg overflow-hidden">
+                <div className="img w-[45%] md:w-[35%] md:h-[90%] h-[70%] flex items-center justify-center ml-5 shadow-md opacity-70 rounded-lg overflow-hidden">
                   <img
                     src={news_data[index].img}
                     alt=""
-                    className="scale-[1.8] h-full w-full  "
+                    className="scale-[1.8] h-full w-full"
                   />
                 </div>
                 <div className="info w-[65%] md:w-[75%]">
@@ -221,9 +225,14 @@ const Enter_press=(e)=>{
               </div>
             </div>
           </div>
-          <div className=" overflow-y-auto px-4 max-h-[300px] w-full board" ref={chatContainerRef}></div>
 
-          <div className="type_area w-[100%] flex items-center justify-center my-8  ">
+          {/* ✅ Fixed ref usage */}
+          <div
+            className="overflow-y-auto px-4 max-h-[300px] w-full board"
+            ref={chatContainerRef}
+          ></div>
+
+          <div className="type_area w-[100%] flex items-center justify-center my-8">
             <div className="cont flex w-[90%] md:w-[95%]">
               <div className="input w-[80%] md:w-[90%]">
                 <input
@@ -236,10 +245,9 @@ const Enter_press=(e)=>{
                   placeholder="Enter Message"
                 />
               </div>
-
-              <div className="btn w-[20%] text-center center ">
+              <div className="btn w-[20%] text-center center">
                 <button className="send" onClick={send}>
-                  <Image src={Send} alt="My Image" width={25} height={20} />
+                  <Image src={Send} alt="Send" width={25} height={20} />
                 </button>
               </div>
             </div>
